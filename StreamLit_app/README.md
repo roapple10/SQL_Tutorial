@@ -13,12 +13,15 @@ This project is an interactive SQL tutorial focused on sales analysis using Pyth
 1. Create and activate a Python virtual environment:
    ```
    python -m venv venv
-   source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
+   source venv/bin/activate 
+   
+    # On Windows, use `venv\Scripts\activate` 
+    # if the activate fail , please type Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser first
    ```
 
 2. Install required packages:
    ```
-   pip install mysql-connector-python streamlit pandas
+   pip install pymysql streamlit pandas python-dotenv
    ```
 
 3. Set up a MySQL database and update the `DB_CONFIG` in `mysql_operations.py` with your credentials.

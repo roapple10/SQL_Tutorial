@@ -1,26 +1,46 @@
 #!/usr/bin/env python
 
-import mysql.connector
-from mysql.connector import Error
+import pymysql
+from pymysql import OperationalError
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Database connection details
 DB_CONFIG = {
-    'host': 'localhost',
-    'user': 'salesuser',
-    'password': 'salespass',
-    'database': 'sales_db'
+    'host': os.getenv('DB_HOST'),
+    'user': os.getenv('DB_USER'),
+    'password': os.getenv('DB_PASSWORD'),
 }
+
+def create_database_if_not_exists(conn):
+    """
+    Create the sales_db database if it does not exist.
+    """
+    cursor = conn.cursor()
+    cursor.execute("CREATE DATABASE IF NOT EXISTS sales_db")
+    cursor.close()
 
 def connect_to_database():
     """
-    Establish a connection to the MySQL database.
+    Establish a connection to the MySQL database using pymysql.
     """
     try:
-        conn = mysql.connector.connect(**DB_CONFIG)
-        if conn.is_connected():
-            print("Successfully connected to MySQL database")
+        # Connect to MySQL server without specifying a database
+        conn = pymysql.connect(**DB_CONFIG)
+        print("Successfully connected to MySQL server")
+
+        # Create sales_db if it doesn't exist
+        create_database_if_not_exists(conn)
+
+        # Now connect to the sales_db database
+        conn.select_db('sales_db')
+        print("Successfully connected to sales_db")
+
         return conn
-    except Error as e:
+    except OperationalError as e:
         print(f"Error connecting to MySQL database: {e}")
         return None
 
@@ -29,7 +49,7 @@ def create_tables(conn):
     Create sample tables for our sales analysis tutorial.
     """
     cursor = conn.cursor()
-    
+
     # Create 'customers' table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS customers (
@@ -39,7 +59,7 @@ def create_tables(conn):
         city VARCHAR(50)
     )
     """)
-    
+
     # Create 'stores' table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS stores (
@@ -48,7 +68,7 @@ def create_tables(conn):
         city VARCHAR(50)
     )
     """)
-    
+
     # Create 'sales' table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS sales (
@@ -61,15 +81,16 @@ def create_tables(conn):
         FOREIGN KEY (store_id) REFERENCES stores(store_id)
     )
     """)
-    
+
     print("Tables created successfully")
+    cursor.close()
 
 def insert_sample_data(conn):
     """
     Insert sample data into our tables.
     """
     cursor = conn.cursor()
-    
+
     # Insert data into 'customers'
     customers_data = [
         ("John Doe", "john@example.com", "New York"),
@@ -79,7 +100,7 @@ def insert_sample_data(conn):
         ("David Lee", "david@example.com", "New York")
     ]
     cursor.executemany("INSERT INTO customers (name, email, city) VALUES (%s, %s, %s)", customers_data)
-    
+
     # Insert data into 'stores'
     stores_data = [
         ("Downtown Store", "New York"),
@@ -88,7 +109,7 @@ def insert_sample_data(conn):
         ("Harbor Point", "Houston")
     ]
     cursor.executemany("INSERT INTO stores (name, city) VALUES (%s, %s)", stores_data)
-    
+
     # Insert data into 'sales'
     sales_data = [
         (1, 1, "2023-01-15", 150.00),
@@ -103,14 +124,15 @@ def insert_sample_data(conn):
         (5, 1, "2023-01-24", 175.75)
     ]
     cursor.executemany("INSERT INTO sales (customer_id, store_id, date, amount) VALUES (%s, %s, %s, %s)", sales_data)
-    
+
     conn.commit()
     print("Sample data inserted successfully")
+    cursor.close()
 
 def basic_sales_analysis(conn):
     cursor = conn.cursor()
     results = []
-    
+
     cursor.execute("SELECT SUM(amount) as total_sales FROM sales")
     results.append(("Total Sales", cursor.fetchone()))
 
@@ -182,8 +204,6 @@ def advanced_analysis(conn):
     cursor = conn.cursor()
     results = []
 
-    # ... (keep all existing queries)
-
     cursor.execute("""
     SELECT 
         c.name,
@@ -203,8 +223,6 @@ def aggregate_function_analysis(conn):
     cursor = conn.cursor()
     results = []
 
-    # ... (keep all existing queries)
-
     cursor.execute("""
     SELECT 
         customer_id,
@@ -220,3 +238,27 @@ def aggregate_function_analysis(conn):
 
     cursor.close()
     return results
+
+def main():
+    # Connect to the database
+    conn = connect_to_database()
+
+    if conn:
+        # Create tables
+        create_tables(conn)
+
+        # Insert sample data
+        insert_sample_data(conn)
+
+        # Perform analyses
+        print("Basic Sales Analysis:", basic_sales_analysis(conn))
+        print("Customer Analysis:", customer_analysis(conn))
+        print("Time-based Analysis:", time_based_analysis(conn))
+        print("Advanced Analysis:", advanced_analysis(conn))
+        print("Aggregate Function Analysis:", aggregate_function_analysis(conn))
+
+        # Close the connection
+        conn.close()
+
+if __name__ == "__main__":
+    main()

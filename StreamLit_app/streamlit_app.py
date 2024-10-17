@@ -1,6 +1,7 @@
 import streamlit as st
-import mysql.connector
 import pandas as pd
+import os
+from dotenv import load_dotenv
 from mysql_operations import (
     connect_to_database,
     create_tables,
@@ -11,6 +12,9 @@ from mysql_operations import (
     advanced_analysis,
     aggregate_function_analysis
 )
+
+# Load environment variables
+load_dotenv()
 
 # Set page configuration
 st.set_page_config(page_title="SQL Tutorial: Sales Analysis", page_icon="📊", layout="wide")
@@ -68,8 +72,10 @@ def main():
     st.title("📊 SQL Tutorial: Sales Analysis")
 
     # Establish database connection
-    conn = connect_to_database()
-    if conn is None:
+    if 'conn' not in st.session_state:
+        st.session_state.conn = connect_to_database()
+    
+    if st.session_state.conn is None:
         st.error("Failed to connect to the database. Please check your connection settings.")
         return
 
@@ -92,17 +98,17 @@ def main():
         col1, col2 = st.columns(2)
         with col1:
             if st.button("Create Tables"):
-                create_tables(conn)
+                create_tables(st.session_state.conn)
                 st.success("Tables created successfully!")
         with col2:
             if st.button("Insert Sample Data"):
-                insert_sample_data(conn)
+                insert_sample_data(st.session_state.conn)
                 st.success("Sample data inserted successfully!")
 
     elif page == "Basic Analysis":
         st.header("📈 Basic Sales Analysis")
         if st.button("Run Basic Analysis"):
-            results = basic_sales_analysis(conn)
+            results = basic_sales_analysis(st.session_state.conn)
             for title, data in results:
                 st.subheader(title)
                 df = pd.DataFrame(data)
@@ -112,7 +118,7 @@ def main():
     elif page == "Customer Analysis":
         st.header("👥 Customer Analysis")
         if st.button("Run Customer Analysis"):
-            results = customer_analysis(conn)
+            results = customer_analysis(st.session_state.conn)
             for title, data in results:
                 st.subheader(title)
                 df = pd.DataFrame(data)
@@ -122,7 +128,7 @@ def main():
     elif page == "Time-based Analysis":
         st.header("⏳ Time-based Analysis")
         if st.button("Run Time-based Analysis"):
-            results = time_based_analysis(conn)
+            results = time_based_analysis(st.session_state.conn)
             for title, data in results:
                 st.subheader(title)
                 df = pd.DataFrame(data)
@@ -132,7 +138,7 @@ def main():
     elif page == "Advanced Analysis":
         st.header("🚀 Advanced Analysis")
         if st.button("Run Advanced Analysis"):
-            results = advanced_analysis(conn)
+            results = advanced_analysis(st.session_state.conn)
             for title, data in results:
                 st.subheader(title)
                 df = pd.DataFrame(data)
@@ -142,16 +148,14 @@ def main():
     elif page == "Aggregate Functions":
         st.header("🧮 Aggregate Function Analysis")
         if st.button("Run Aggregate Function Analysis"):
-            results = aggregate_function_analysis(conn)
+            results = aggregate_function_analysis(st.session_state.conn)
             for title, data in results:
                 st.subheader(title)
                 df = pd.DataFrame(data)
                 st.dataframe(df)
         st.info("This section covers various aggregate functions and their applications in SQL.")
 
-    # Close the database connection when the app is done
-    if conn.is_connected():
-        conn.close()
+    # Connection is kept open, no need to close it here
 
 if __name__ == "__main__":
     main()

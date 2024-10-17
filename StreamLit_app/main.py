@@ -8,7 +8,7 @@ from mysql_operations import (
     advanced_analysis,
     aggregate_function_analysis
 )
-from mysql.connector import Error
+from pymysql import OperationalError
 
 def main():
     """
@@ -24,18 +24,17 @@ def main():
         insert_sample_data(conn)
 
         # Run various sales analysis operations
-        basic_sales_analysis(conn)
-        customer_analysis(conn)
-        time_based_analysis(conn)
-        advanced_analysis(conn)
-        aggregate_function_analysis(conn)
+        print("Basic Sales Analysis:", basic_sales_analysis(conn))
+        print("Customer Analysis:", customer_analysis(conn))
+        print("Time-based Analysis:", time_based_analysis(conn))
+        print("Advanced Analysis:", advanced_analysis(conn))
+        print("Aggregate Function Analysis:", aggregate_function_analysis(conn))
 
-    except Error as e:
+    except OperationalError as e:
         print(f"Error: {e}")
     finally:
-        if conn.is_connected():
-            conn.close()
-            print("MySQL connection is closed")
+        conn.close()
+        print("MySQL connection is closed")
 
 if __name__ == '__main__':
     main()
