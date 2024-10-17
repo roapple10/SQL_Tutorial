@@ -8,6 +8,7 @@ This project is an interactive SQL tutorial focused on sales analysis using Pyth
 - `mysql_operations.py`: Contains functions for database operations and analysis
 - `streamlit_app.py`: Streamlit app for interactive exploration of the SQL tutorial
 - `example.env`: Example environment file with configuration settings
+- `requirements.txt`: List of Python packages required for the project
 
 ## Setup
 
@@ -19,7 +20,7 @@ This project is an interactive SQL tutorial focused on sales analysis using Pyth
 
 2. Install required packages:
    ```
-   pip install mysql-connector-python streamlit pandas python-dotenv
+   pip install -r requirements.txt
    ```
 
 3. Set up a MySQL database and rename the configuration file:
