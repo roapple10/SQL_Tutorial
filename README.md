@@ -12,22 +12,28 @@ This project is an interactive SQL tutorial focused on sales analysis using Pyth
 
 ## Setup
 
-1. Create and activate a Python virtual environment:
+1. Clone the repository:
+   ```
+   git clone https://github.com/roapple10/SQL_Tutorial.git
+   cd SQL_Tutorial
+   ```
+
+2. Create and activate a Python virtual environment:
    ```
    python -m venv venv
    source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
    ```
 
-2. Install required packages:
+3. Install required packages:
    ```
    pip install -r requirements.txt
    ```
 
-3. Set up a MySQL database and rename the configuration file:
+4. Set up a MySQL database and rename the configuration file:
    - Rename `example.env` to `.env` in the root folder
    - Update the values in `.env` with your MySQL database credentials
 
-4. Run the Streamlit app:
+5. Run the Streamlit app:
    ```
    cd streamlit_app
    streamlit run streamlit_app.py
