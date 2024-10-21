@@ -2,6 +2,7 @@ import pymysql
 import os
 from dotenv import load_dotenv
 
+
 """
 這個腳本演示了事務的基本概念和ACID特性：
 原子性 (Atomicity):
@@ -56,37 +57,64 @@ try:
     )
     """)
     
-    # 插入一些測試數據
-    cursor.execute("INSERT INTO accounts (name, balance) VALUES ('Alice', 1000), ('Bob', 500)")
-    conn.commit()
-    print("測試數據已插入")
+    # 插入帳戶數據，僅當帳戶不存在時
+    def insert_account_if_not_exists(account_name, initial_balance):
+        cursor.execute("SELECT 1 FROM accounts WHERE name = %s LIMIT 1", (account_name,))
+        
+        if cursor.fetchone() is None:  # 如果帳戶不存在
+            cursor.execute("INSERT INTO accounts (name, balance) VALUES (%s, %s)", (account_name, initial_balance))
+            conn.commit()
+            print(f"帳戶 {account_name} 已插入")
+        else:
+            print(f"帳戶 {account_name} 已存在，無需插入")
+
+    # 檢查並插入 Alice 和 Bob
+    insert_account_if_not_exists('Alice', 1000)
+    insert_account_if_not_exists('Bob', 500)
+
 
     # 定義轉帳函數
     def transfer_money(from_account, to_account, amount):
         try:
             # 開始事務
             conn.begin()
-            
-            # 步驟1：從 from_account 扣款
+
+            # 步驟1：獲取 from_account 的當前餘額，並檢查是否足夠
+            cursor.execute("SELECT balance FROM accounts WHERE name = %s", (from_account,))
+            from_balance = cursor.fetchone()[0]
+
+            if from_balance < amount:
+                raise Exception(f"{from_account} 餘額不足，無法轉帳 {amount} 元")
+
+            # 步驟2：從 from_account 扣款
             cursor.execute("UPDATE accounts SET balance = balance - %s WHERE name = %s", (amount, from_account))
-            
-            # 模擬可能發生的錯誤
+
+            # 模擬可能發生的錯誤（可選）
             # if True:
             #     raise Exception("模擬錯誤：系統崩潰")
-            
-            # 步驟2：給 to_account 增加金額
+
+            # 步驟3：檢查 to_account 是否存在
+            cursor.execute("SELECT balance FROM accounts WHERE name = %s", (to_account,))
+            to_balance = cursor.fetchone()
+
+            if to_balance is None:
+                raise Exception(f"{to_account} 帳戶不存在")
+
+            # 步驟4：給 to_account 增加金額
             cursor.execute("UPDATE accounts SET balance = balance + %s WHERE name = %s", (amount, to_account))
-            
+
             # 提交事務
             conn.commit()
             print(f"成功從 {from_account} 轉帳 {amount} 元給 {to_account}")
+
         except Exception as e:
             # 如果發生錯誤，回滾事務
             conn.rollback()
             print(f"轉帳失敗：{str(e)}")
 
+
     # 執行轉帳操作
-    transfer_money('Alice', 'Bob', 200)
+    transfer_money('Alice', 'Bob', 20000)
 
     # 檢查帳戶餘額
     cursor.execute("SELECT name, balance FROM accounts")
@@ -103,5 +131,3 @@ finally:
     if 'conn' in locals() and conn.open:
         conn.close()
         print('資料庫連接已關閉')
-
-
