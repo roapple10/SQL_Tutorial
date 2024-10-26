@@ -15,7 +15,7 @@ The project consists of three main Jupyter notebooks:
 1. Clone the repository:
    ```
    git clone https://github.com/roapple10/SQL_Tutorial.git
-   cd MS_SQL_Tutorial
+   cd MSSQL_Tutorial
    ```
 
 2. Create and activate a Python virtual environment:
