@@ -1,4 +1,0 @@
-pymysql
-streamlit
-pandas
-python-dotenv
