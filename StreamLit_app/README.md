@@ -7,10 +7,18 @@ This project is an interactive SQL tutorial focused on sales analysis using Pyth
 - `main.py`: Entry point for running the analysis without the Streamlit interface
 - `mysql_operations.py`: Contains functions for database operations and analysis
 - `streamlit_app.py`: Streamlit app for interactive exploration of the SQL tutorial
+- `example.env`: Example environment file with configuration settings
+- `requirements.txt`: List of Python packages required for the project
 
 ## Setup
 
-1. Create and activate a Python virtual environment:
+1. Clone the repository:
+   ```
+   git clone https://github.com/roapple10/SQL_Tutorial.git
+   cd SQL_Tutorial
+   ```
+
+2. Create and activate a Python virtual environment:
    ```
    python -m venv venv
    source venv/bin/activate 
@@ -19,15 +27,22 @@ This project is an interactive SQL tutorial focused on sales analysis using Pyth
     # if the activate fail , please type Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser first
    ```
 
-2. Install required packages:
+3. Install required packages:
    ```
+<<<<<<< HEAD:StreamLit_app/README.md
    pip install pymysql streamlit pandas python-dotenv
+=======
+   pip install -r requirements.txt
+>>>>>>> a07fe3201a7aa5a9759f7d09d53890b617c28454:README.md
    ```
 
-3. Set up a MySQL database and update the `DB_CONFIG` in `mysql_operations.py` with your credentials.
+4. Set up a MySQL database and rename the configuration file:
+   - Rename `example.env` to `.env` in the root folder
+   - Update the values in `.env` with your MySQL database credentials
 
-4. Run the Streamlit app:
+5. Run the Streamlit app:
    ```
+   cd streamlit_app
    streamlit run streamlit_app.py
    ```
 
@@ -51,6 +66,7 @@ Navigate through different sections using the sidebar and run analyses with the 
 - Basic to advanced SQL queries
 - Interactive Streamlit interface for easy exploration
 - Comprehensive sales analysis including customer behavior, time trends, and advanced metrics
+- Environment variable configuration for secure database connection
 
 ## Learning Outcomes
 
